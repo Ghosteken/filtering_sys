@@ -1,35 +1,35 @@
-'use client'
+'use client';
 
-import EmptyState from '@/components/Products/EmptyState'
-import Product from '@/components/Products/Product'
-import ProductSkeleton from '@/components/Products/ProductSkeleton'
+import EmptyState from '@/components/Products/EmptyState';
+import Product from '@/components/Products/Product';
+import ProductSkeleton from '@/components/Products/ProductSkeleton';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion'
+} from '@/components/ui/accordion';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Slider } from '@/components/ui/slider'
-import type { Product as TProduct } from '@/db'
-import { cn } from '@/lib/utils'
-import { ProductState } from '@/lib/validators/product-validator'
-import { useQuery } from '@tanstack/react-query'
-import { QueryResult } from '@upstash/vector'
-import axios from 'axios'
-import debounce from 'lodash.debounce'
-import { ChevronDown, Filter } from 'lucide-react'
-import { useCallback, useState } from 'react'
+} from '@/components/ui/dropdown-menu';
+import { Slider } from '@/components/ui/slider';
+import type { Product as TProduct } from '@/db';
+import { cn } from '@/lib/utils';
+import { ProductState } from '@/lib/validators/product-validator';
+import { useQuery } from '@tanstack/react-query';
+import { QueryResult } from '@upstash/vector';
+import axios from 'axios';
+import debounce from 'lodash.debounce';
+import { ChevronDown, Filter } from 'lucide-react';
+import { useCallback, useState } from 'react';
 
 const SORT_OPTIONS = [
   { name: 'None', value: 'none' },
   { name: 'Price: Low to High', value: 'price-asc' },
   { name: 'Price: High to Low', value: 'price-desc' },
-] as const
+] as const;
 
 const COLOR_FILTERS = {
   id: 'color',
@@ -41,7 +41,7 @@ const COLOR_FILTERS = {
     { value: 'green', label: 'Green' },
     { value: 'purple', label: 'Purple' },
   ] as const,
-}
+};
 
 const SIZE_FILTERS = {
   id: 'size',
@@ -51,7 +51,7 @@ const SIZE_FILTERS = {
     { value: 'M', label: 'M' },
     { value: 'L', label: 'L' },
   ],
-} as const
+} as const;
 
 const PRICE_FILTERS = {
   id: 'price',
@@ -68,16 +68,16 @@ const PRICE_FILTERS = {
     },
     // custom option defined in JSX
   ],
-} as const
+} as const;
 
 const SUBCATEGORIES = [
   { name: 'T-Shirts', selected: true, href: '#' },
   { name: 'Hoodies', selected: false, href: '#' },
   { name: 'Sweatshirts', selected: false, href: '#' },
   { name: 'Accessories', selected: false, href: '#' },
-]
+];
 
-const DEFAULT_CUSTOM_PRICE = [0, 100] as [number, number]
+const DEFAULT_CUSTOM_PRICE = [0, 100] as [number, number];
 
 export default function Home() {
   const [filter, setFilter] = useState<ProductState>({
@@ -85,7 +85,7 @@ export default function Home() {
     price: { isCustom: false, range: DEFAULT_CUSTOM_PRICE },
     size: ['L', 'M', 'S'],
     sort: 'none',
-  })
+  });
 
   const { data: products, refetch } = useQuery({
     queryKey: ['products'],
@@ -100,43 +100,43 @@ export default function Home() {
             size: filter.size,
           },
         }
-      )
+      );
 
-      return data
+      return data;
     },
-  })
+  });
 
-  const onSubmit = () => refetch()
+  const onSubmit = () => refetch();
 
-  const debouncedSubmit = debounce(onSubmit, 400)
-  const _debouncedSubmit = useCallback(debouncedSubmit, [])
+  const debouncedSubmit = debounce(onSubmit, 400);
+  const _debouncedSubmit = useCallback(debouncedSubmit, []);
 
   const applyArrayFilter = ({
     category,
     value,
   }: {
-    category: keyof Omit<typeof filter, 'price' | 'sort'>
-    value: string
+    category: keyof Omit<ProductState, 'price' | 'sort'>;
+    value: string;
   }) => {
-    const isFilterApplied = filter[category].includes(value as never)
+    const isFilterApplied = filter[category].includes(value as never);
 
     if (isFilterApplied) {
       setFilter((prev) => ({
         ...prev,
-        [category]: prev[category].filter((v) => v !== value),
-      }))
+        [category]: (prev[category] as string[]).filter((v) => v !== value),
+      }));
     } else {
       setFilter((prev) => ({
         ...prev,
-        [category]: [...prev[category], value],
-      }))
+        [category]: [...(prev[category] as string[]), value],
+      }));
     }
 
-    _debouncedSubmit()
-  }
+    _debouncedSubmit();
+  };
 
-  const minPrice = Math.min(filter.price.range[0], filter.price.range[1])
-  const maxPrice = Math.max(filter.price.range[0], filter.price.range[1])
+  const minPrice = Math.min(filter.price.range[0], filter.price.range[1]);
+  const maxPrice = Math.max(filter.price.range[0], filter.price.range[1]);
 
   return (
     <main className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
@@ -164,9 +164,9 @@ export default function Home() {
                     setFilter((prev) => ({
                       ...prev,
                       sort: option.value,
-                    }))
+                    }));
 
-                    _debouncedSubmit()
+                    _debouncedSubmit();
                   }}>
                   {option.name}
                 </button>
@@ -214,7 +214,7 @@ export default function Home() {
                             applyArrayFilter({
                               category: 'color',
                               value: option.value,
-                            })
+                            });
                           }}
                           checked={filter.color.includes(option.value)}
                           className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
@@ -247,7 +247,7 @@ export default function Home() {
                             applyArrayFilter({
                               category: 'size',
                               value: option.value,
-                            })
+                            });
                           }}
                           checked={filter.size.includes(option.value)}
                           className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
@@ -283,9 +283,9 @@ export default function Home() {
                                 isCustom: false,
                                 range: [...option.value],
                               },
-                            }))
+                            }));
 
-                            _debouncedSubmit()
+                            _debouncedSubmit();
                           }}
                           checked={
                             !filter.price.isCustom &&
@@ -313,9 +313,9 @@ export default function Home() {
                                 isCustom: true,
                                 range: [0, 100],
                               },
-                            }))
+                            }));
 
-                            _debouncedSubmit()
+                            _debouncedSubmit();
                           }}
                           checked={filter.price.isCustom}
                           className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
@@ -347,7 +347,7 @@ export default function Home() {
                         })}
                         disabled={!filter.price.isCustom}
                         onValueChange={(range) => {
-                          const [newMin, newMax] = range
+                          const [newMin, newMax] = range;
 
                           setFilter((prev) => ({
                             ...prev,
@@ -355,9 +355,9 @@ export default function Home() {
                               isCustom: true,
                               range: [newMin, newMax],
                             },
-                          }))
+                          }));
 
-                          _debouncedSubmit()
+                          _debouncedSubmit();
                         }}
                         value={
                           filter.price.isCustom
@@ -381,7 +381,9 @@ export default function Home() {
             {products && products.length === 0 ? (
               <EmptyState />
             ) : products ? (
-              products.map((product) => <Product key={'done'} product={product.metadata!} />)
+              products.map((product) => (
+                <Product key={product.metadata.id} product={product.metadata!} />
+              ))
             ) : (
               new Array(12)
                 .fill(null)
@@ -391,5 +393,5 @@ export default function Home() {
         </div>
       </section>
     </main>
-  )
+  );
 }
