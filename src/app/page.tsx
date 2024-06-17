@@ -118,7 +118,7 @@ export default function Home() {
     category: keyof Omit<ProductState, 'price' | 'sort'>;
     value: string;
   }) => {
-    const isFilterApplied = filter[category].includes(value as never);
+    const isFilterApplied = (filter[category] as string[]).includes(value);
 
     if (isFilterApplied) {
       setFilter((prev) => ({
